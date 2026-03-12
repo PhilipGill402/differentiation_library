@@ -14,7 +14,6 @@ void reset_node(node_t* node) {
 
 void calc_grad(node_t* node) {
     if (node == NULL || node->backward == NULL) {
-        printf("%f\n", node->grad); 
         return;
     }
     
