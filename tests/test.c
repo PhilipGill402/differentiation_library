@@ -2,7 +2,7 @@
 #include "parser.h"
 #include <stdio.h>
 
-int main() {
+void test() {
     char* expr = "sqrt(x*y)";
     parser_t parser = create_parser(expr);
     set_var(&parser, "x", 4);
