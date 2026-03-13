@@ -216,6 +216,15 @@ This project is plain C and appears intended for a Unix-like environment because
 
 You will likely need to link against the math library.
 
+### Building Test Programs
+
+This project contains two different test programs: `test.c` and `cli.c`. Specify which one you want to build in the Makefile and then run these commands to build and run:
+
+```bash
+make
+./test
+```
+
 ## Current Limitations
 
 Some likely limitations or areas to improve:
