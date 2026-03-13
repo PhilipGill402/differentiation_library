@@ -222,7 +222,10 @@ node_t* create_graph(parser_t* parser) {
 }
 
 
-parser_t create_parser(const char* expr, arena_t* arena) {
+parser_t create_parser(const char* expr) {
+    arena_t* arena = malloc(sizeof(arena_t));
+    *arena = create_arena(PAGE_SIZE);
+
     lexer_t* lexer = reserve(sizeof(lexer_t), arena); 
     *lexer = create_lexer(expr, arena);
 
@@ -279,4 +282,11 @@ void set_var(parser_t* parser, char* name, double val) {
 
     push_back(&parser->variables, &entry);
 }
+
+void release_parser(parser_t* parser) {
+    release_arena(parser->arena); 
+    free(parser->arena);
+    parser->arena = NULL;
+}
+
 

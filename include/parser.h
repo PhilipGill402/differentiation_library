@@ -2,6 +2,7 @@
 #define INCLUDE_PARSER_H_
 
 #include <math.h>
+#include <stdlib.h>
 #include "lexer.h"
 #include "token.h"
 #include "string_t.h"
@@ -27,9 +28,10 @@ parser_t init_parser(lexer_t* lexer, arena_t* arena);
 void get_infix(parser_t* parser);
 void get_postfix(parser_t* parser);
 node_t* create_graph(parser_t* parser);
-parser_t create_parser(const char* expr, arena_t* arena);
+parser_t create_parser(const char* expr);
 node_t* parse(parser_t* parser);
 void create_var(parser_t* parser, char* name);
 void set_var(parser_t* parser, char* name, double val);
+void release_parser(parser_t* parser);
 
 #endif // !INCLUDE_PARSER_H_
