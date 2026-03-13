@@ -238,9 +238,9 @@ Possible next steps:
 - add pretty-printing for graphs
 - support reevaluating a graph after changing variable values
 
-## Why this project is interesting
+## What I've Learned
 
-This repo combines several good low-level C topics in one place:
+This repo taught me several good low-level C topics in one place:
 
 - memory management
 - custom data structures
