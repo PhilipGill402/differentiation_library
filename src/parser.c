@@ -31,7 +31,7 @@ int is_right_associative(token_t token) {
     }
 }
 
-parser_t create_parser(lexer_t* lexer, arena_t* arena) {
+parser_t init_parser(lexer_t* lexer, arena_t* arena) {
     parser_t parser;
     parser.tokens = create_queue(sizeof(token_t), arena);
     parser.op_stack = create_stack(sizeof(token_t), arena);
@@ -150,16 +150,22 @@ node_t* create_graph(parser_t* parser) {
     return *(node_t**)stack_top(&node_stack);
 }
 
-node_t* parse(const char* expr, arena_t* arena) {
-    lexer_t lexer = create_lexer(expr, arena);
-    parser_t parser = create_parser(&lexer, arena);
-    get_infix(&parser);
-    get_postfix(&parser);
-    node_t* root = create_graph(&parser);
-    backprop(root, &parser.nodes);
 
-    for (int i = 0; i < parser.variables.size; i++) {
-        entry_t entry = *(entry_t*)get(&parser.variables, i);
+parser_t create_parser(const char* expr, arena_t* arena) {
+    lexer_t lexer = create_lexer(expr, arena);
+    parser_t parser = init_parser(&lexer, arena);
+
+    return parser;
+}
+
+node_t* parse(parser_t* parser) {
+    get_infix(parser);
+    get_postfix(parser);
+    node_t* root = create_graph(parser);
+    backprop(root, &parser->nodes);
+
+    for (int i = 0; i < parser->variables.size; i++) {
+        entry_t entry = *(entry_t*)get(&parser->variables, i);
         print_entry(&entry);
         printf("\n");
     }

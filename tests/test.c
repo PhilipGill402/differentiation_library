@@ -6,7 +6,8 @@ int main() {
     arena_t arena = create_arena(PAGE_SIZE);
     
     char* expr = "x+x";
-    node_t* root = parse(expr, &arena);
+    parser_t parser = create_parser(expr, &arena);
+    node_t* root = parse(&parser);
 
     print_node(root); 
 

@@ -22,10 +22,11 @@ typedef struct {
     lexer_t* lexer;
 } parser_t;
 
-parser_t create_parser(lexer_t* lexer, arena_t* arena);
+parser_t init_parser(lexer_t* lexer, arena_t* arena);
 void get_infix(parser_t* parser);
 void get_postfix(parser_t* parser);
 node_t* create_graph(parser_t* parser);
-node_t* parse(const char* expr, arena_t* arena);
+parser_t create_parser(const char* expr, arena_t* arena);
+node_t* parse(parser_t* parser);
 
 #endif // !INCLUDE_PARSER_H_
