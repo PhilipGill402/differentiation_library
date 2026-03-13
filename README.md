@@ -71,12 +71,6 @@ The lexer scans an input expression and produces tokens for:
 - operators
 - parentheses
 
-Examples:
-
-- `3*(3+3)`
-- `x*x+x`
-- `sin(x)+sqrt(x)`
-
 ### 2. Parsing
 
 The parser:
@@ -131,15 +125,13 @@ This allows the project to compute gradients for all variables used in the expre
 
 ```c
 int main() {
-    arena_t arena = create_arena(PAGE_SIZE);
-
-    parser_t parser = create_parser("3*(3+3)", &arena);
+    parser_t parser = create_parser("3*(3+3)");
     node_t* root = parse(&parser);
 
     print_node(root);
     putchar('\n');
 
-    release_arena(&arena);
+    release_parser(&parser);
 }
 ```
 
@@ -147,9 +139,7 @@ int main() {
 
 ```c
 int main() {
-    arena_t arena = create_arena(PAGE_SIZE);
-
-    parser_t parser = create_parser("x*x+x", &arena);
+    parser_t parser = create_parser("x*x+x");
     set_var(&parser, "x", 3.0);
 
     node_t* root = parse(&parser);
@@ -157,7 +147,7 @@ int main() {
     print_node(root);
     putchar('\n');
 
-    release_arena(&arena);
+    release_parser(&parser);
 }
 ```
 
@@ -165,9 +155,7 @@ int main() {
 
 ```c
 int main() {
-    arena_t arena = create_arena(PAGE_SIZE);
-
-    parser_t parser = create_parser("sin(x)+sqrt(x)", &arena);
+    parser_t parser = create_parser("sin(x)+sqrt(x)");
     set_var(&parser, "x", 4.0);
 
     node_t* root = parse(&parser);
@@ -175,7 +163,7 @@ int main() {
     print_node(root);
     putchar('\n');
 
-    release_arena(&arena);
+    release_parser(&parser);
 }
 ```
 
@@ -199,43 +187,6 @@ node_t* root = parse(&parser);
 ```
 
 After parsing and backpropagation, variable entries store both value and gradient.
-
-## Example Test Cases
-
-### Numeric tests
-
-```text
-3+4 = 7
-3*3+3 = 12
-3*(3+3) = 18
-8-3-2 = 3
-20/5/2 = 2
-12/(3+1)*2 = 6
-2^3 = 8
-```
-
-### Variable tests
-
-```text
-x+x          with x=5   -> value 10, dx = 2
-x*x          with x=5   -> value 25, dx = 10
-x*x+x        with x=3   -> value 12, dx = 7
-x+y          with x=2,y=3 -> value 5, dx = 1, dy = 1
-x*y+x        with x=2,y=3 -> value 8, dx = 4, dy = 2
-x/y          with x=8,y=2 -> value 4, dx = 0.5, dy = -2
-x^y          with x=2,y=3 -> value 8, dx = 12, dy ≈ 5.545177444
-```
-
-### Function tests
-
-```text
-sin(x)       with x=0     -> value 0, dx = 1
-cos(x)       with x=0     -> value 1, dx = 0
-tan(x)       with x=0     -> value 0, dx = 1
-sqrt(x)      with x=4     -> value 2, dx = 0.25
-sin(x*x)     with x=2     -> value ≈ -0.7568024953, dx ≈ -2.6145744835
-sqrt(x*x+1)  with x=3     -> value ≈ 3.1622776602, dx ≈ 0.9486832981
-```
 
 ## Design Notes
 
@@ -265,24 +216,14 @@ This project is plain C and appears intended for a Unix-like environment because
 
 You will likely need to link against the math library.
 
-Example:
-
-```bash
-gcc *.c -lm -o autodiff
-```
-
-If you split headers and source files into folders, adjust the command accordingly.
-
 ## Current Limitations
 
 Some likely limitations or areas to improve:
 
 - function support is currently limited to `sin`, `cos`, `tan`, and `sqrt`
-- unary minus handling may need special-case parsing if not already implemented
+- unary minus handling is not currently handled
 - parser error handling can be improved for malformed expressions
-- some container edge cases and bounds checks could be tightened further
 - function dispatch currently compares names at graph-construction time rather than using a more direct function registry
-- the custom containers and allocator are useful learning projects, but they should be tested heavily before production use
 
 ## Future Improvements
 
@@ -294,7 +235,6 @@ Possible next steps:
 - support unary negation explicitly
 - add a cleaner public API
 - add unit tests
-- separate headers and sources into `include/` and `src/`
 - add pretty-printing for graphs
 - support reevaluating a graph after changing variable values
 
@@ -310,25 +250,3 @@ This repo combines several good low-level C topics in one place:
 - graph construction
 - automatic differentiation
 - numerical testing
-
-It is a strong educational project for learning both systems programming and applied math tooling in C.
-
-## License
-
-Add a license here if you plan to publish the repository publicly.
-
-For example:
-
-- MIT
-- Apache-2.0
-- GPL-3.0
-
-## Author
-
-Add your name and any links you want here.
-
-Example:
-
-```text
-Bennett Brown
-```
