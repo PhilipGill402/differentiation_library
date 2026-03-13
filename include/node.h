@@ -23,7 +23,7 @@ struct node_t {
 };
 
 node_t* create_node(double val, arena_t* arena);
-node_t* create_var(string_t* name, vector_t* variables, arena_t* arena);
+node_t* create_var_node(string_t* name, vector_t* variables, arena_t* arena);
 node_t* node_add(node_t* node_a, node_t* node_b, arena_t* arena);
 node_t* node_sub(node_t* node_a, node_t* node_b, arena_t* arena);
 node_t* node_mul(node_t* node_a, node_t* node_b, arena_t* arena);

@@ -106,7 +106,7 @@ node_t* create_graph(parser_t* parser) {
             stack_push(&node_stack, &node);
             push_back(&parser->nodes, &node);
         } else if (token.type == VAR) {
-            node_t* node = create_var(&token.val.name, &parser->variables, parser->arena);
+            node_t* node = create_var_node(&token.val.name, &parser->variables, parser->arena);
             stack_push(&node_stack, &node);
             push_back(&parser->nodes, &node);
         } else if (token.type == OP) {
@@ -152,8 +152,10 @@ node_t* create_graph(parser_t* parser) {
 
 
 parser_t create_parser(const char* expr, arena_t* arena) {
-    lexer_t lexer = create_lexer(expr, arena);
-    parser_t parser = init_parser(&lexer, arena);
+    lexer_t* lexer = reserve(sizeof(lexer_t), arena); 
+    *lexer = create_lexer(expr, arena);
+
+    parser_t parser = init_parser(lexer, arena);
 
     return parser;
 }
@@ -161,6 +163,7 @@ parser_t create_parser(const char* expr, arena_t* arena) {
 node_t* parse(parser_t* parser) {
     get_infix(parser);
     get_postfix(parser);
+
     node_t* root = create_graph(parser);
     backprop(root, &parser->nodes);
 
@@ -171,5 +174,38 @@ node_t* parse(parser_t* parser) {
     }
 
     return root;
+}
+
+void create_var(parser_t* parser, char* name) {
+    string_t str_name = string_literal(name, parser->arena); 
+    create_var_node(&str_name, &parser->variables, parser->arena); 
+}
+
+void set_var(parser_t* parser, char* name, double val) {
+    string_t str_name = string_literal(name, parser->arena);
+    
+    for (int i = 0; i < parser->variables.size; i++) {
+        entry_t entry = *(entry_t*)get(&parser->variables, i);
+        if (string_compare(&str_name, &entry.name) == 0) {
+            entry.node->value = val;
+            return;
+        }
+    }
+    
+    node_t* node = reserve(sizeof(node_t), parser->arena);
+    node->value = val;
+    node->grad = 0;
+    node->left = NULL;
+    node->right = NULL;
+    node->backward = NULL;
+    node->is_var = 1;
+    node->name = str_name;
+
+    entry_t entry = {
+        .name = str_name,
+        .node = node 
+    };
+
+    push_back(&parser->variables, &entry);
 }
 

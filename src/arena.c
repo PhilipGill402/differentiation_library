@@ -139,8 +139,11 @@ void release(void* ptr, arena_t* arena) {
 void* move(void* ptr, size_t size, arena_t* arena) {
     void* new_ptr = reserve(size, arena);
     block_t* block = (block_t*)((uint8_t*)ptr - sizeof(block_t));
-    size_t old_size = block->size;
-    memcpy(new_ptr, ptr, old_size);
+    
+    size_t old_payload_size = block->size - sizeof(block_t);
+    size_t copy_size = old_payload_size < size ? old_payload_size : size;
+    memcpy(new_ptr, ptr, copy_size);
+
     release(ptr, arena);
     ptr = new_ptr;
 

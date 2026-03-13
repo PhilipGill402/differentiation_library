@@ -107,7 +107,7 @@ void print_vector(const vector_t* vec, void (*print_element)(void*)) {
 }
 
 void* get(const vector_t* vec, int index){
-    if (index > vector_size(vec)){
+    if (index < 0 || index >= vector_size(vec)){
         fprintf(stderr, "'index' is out of the range of the vector");
         return NULL;
     }
@@ -139,7 +139,7 @@ void insert(vector_t* vec, void* element, int index){
     }
 
     //shift everything over one
-    for (int i = vector_size(vec) + 1; i >= index; i--){
+    for (int i = vector_size(vec); i >= index; i--){
         memcpy((char*)vec->array + i * vec->element_size, (char*)vec->array + (i - 1) * vec->element_size, vec->element_size); 
     }
     //set the element at index to the given element

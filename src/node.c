@@ -43,22 +43,13 @@ node_t* create_node(double val, arena_t* arena) {
     return node;
 }
 
-node_t* create_var(string_t* name, vector_t* variables, arena_t* arena) {
+node_t* create_var_node(string_t* name, vector_t* variables, arena_t* arena) {
     node_t* node; 
 
     for (int i = 0; i < variables->size; i++) {
         entry_t entry = *(entry_t*)get(variables, i);
         if (string_compare(name, &entry.name) == 0) {
-            node = entry.node;
-            node->value = 0;
-            node->grad = 0;
-            node->left = NULL;
-            node->right = NULL;
-            node->backward = NULL;
-            node->is_var = 1;
-            node->name = *name;
-
-            return node;
+            return entry.node;
         }
     }
     

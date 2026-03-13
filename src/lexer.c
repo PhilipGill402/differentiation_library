@@ -23,7 +23,7 @@ void advance(lexer_t* lexer) {
 
 token_t get_next_token(lexer_t* lexer) {
     while (lexer->curr_char != '\0') {
-        if (isspace(lexer->curr_char)) {
+        if (isspace((unsigned char)lexer->curr_char)) {
             advance(lexer); 
         } else if (isdigit(lexer->curr_char)) {
             string_t val = create_string(lexer->arena);
@@ -44,7 +44,7 @@ token_t get_next_token(lexer_t* lexer) {
 
             double num = string_to_double(&val);
             return create_num_token(num);
-        } else if (isalpha(lexer->curr_char)) {
+        } else if ((unsigned char)isalpha(lexer->curr_char)) {
             string_t val = create_string(lexer->arena);
 
             while (isalpha(lexer->curr_char)) {
@@ -75,6 +75,7 @@ token_t get_next_token(lexer_t* lexer) {
             advance(lexer);
             return create_token(RPAREN, ')');
         } else {
+            advance(lexer); 
             token_t token = {
                 .type = UNKNOWN,
                 .val.name = string_literal("UNKNOWN", lexer->arena)

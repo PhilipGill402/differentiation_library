@@ -28,5 +28,7 @@ void get_postfix(parser_t* parser);
 node_t* create_graph(parser_t* parser);
 parser_t create_parser(const char* expr, arena_t* arena);
 node_t* parse(parser_t* parser);
+void create_var(parser_t* parser, char* name);
+void set_var(parser_t* parser, char* name, double val);
 
 #endif // !INCLUDE_PARSER_H_
