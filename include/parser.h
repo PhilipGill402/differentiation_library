@@ -7,12 +7,14 @@
 #include "arena.h"
 #include "queue.h"
 #include "stack.h"
+#include "vector.h"
 #include "node.h"
 
 typedef struct {
     queue_t tokens;
     stack_s op_stack;
     queue_t output;
+    vector_t variables;
     arena_t* arena;
     lexer_t* lexer;
 } parser_t;

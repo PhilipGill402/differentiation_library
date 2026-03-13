@@ -65,7 +65,10 @@ void get_postfix(parser_t* parser) {
         if (token.type == NUM) {
             enqueue(&parser->output, &token);
         } else if (token.type == OP) {
-            while (!stack_is_empty(&parser->op_stack) && ((*(token_t*)stack_top(&parser->op_stack)).type == OP) && (operator_precedence(*(token_t*)stack_top(&parser->op_stack)) > operator_precedence(token))) {
+            while (!stack_is_empty(&parser->op_stack)
+                    && ((*(token_t*)stack_top(&parser->op_stack)).type == OP) 
+                    && ((operator_precedence(*(token_t*)stack_top(&parser->op_stack)) > operator_precedence(token))
+                        || ((operator_precedence(*(token_t*)stack_top(&parser->op_stack)) == operator_precedence(token)) && !is_right_associative(token)))) {
                 token_t op = *(token_t*)stack_pop(&parser->op_stack);
                 enqueue(&parser->output, &op);
             }
@@ -115,6 +118,18 @@ node_t* create_graph(parser_t* parser) {
                     break;
                 case '*':
                     node = node_mul(left, right, parser->arena);
+                    stack_push(&node_stack, &node);
+                    break;
+                case '-':
+                    node = node_sub(left, right, parser->arena);
+                    stack_push(&node_stack, &node);
+                    break;
+                case '/':
+                    node = node_div(left, right, parser->arena);
+                    stack_push(&node_stack, &node);
+                    break;
+                case '^':
+                    node = node_pow(left, right, parser->arena);
                     stack_push(&node_stack, &node);
                     break;
                 default:

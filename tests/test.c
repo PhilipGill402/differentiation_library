@@ -5,7 +5,7 @@
 int main() {
     arena_t arena = create_arena(PAGE_SIZE);
     
-    char* expr = "3*(4+5)";
+    char* expr = "20/5/2";
     node_t* root = parse(expr, &arena); 
 
     backprop(root);
