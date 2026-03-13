@@ -1,33 +1,20 @@
 #include "backprop.h"
 
-/* HELPERS */
-void reset_node(node_t* node) {
-    if (node == NULL) {
-        return;
-    } 
-
-    node->grad = 0;
-
-    reset_node(node->left);
-    reset_node(node->right);
-}
-
-void calc_grad(node_t* node) {
-    if (node == NULL || node->backward == NULL) {
-        return;
-    }
-    
-    node->backward(node);
-
-    calc_grad(node->left);
-    calc_grad(node->right);
-}
-
-double backprop(node_t* output) {
+double backprop(node_t* root, vector_t* nodes) {
     //reset all nodes starting at the output node 
-    reset_node(output);
-    output->grad = 1;
-    calc_grad(output);
+    for (int i = 0; i < nodes->size; i++) {
+        node_t* node = *(node_t**)get(nodes, i);
+        node->grad = 0.0;
+    }
 
-    return output->grad;
+    root->grad = 1;
+    
+    for (int i = nodes->size - 1; i >= 0; i--) {
+        node_t* node = *(node_t**)get(nodes, i);
+        if (node->backward != NULL) {
+            node->backward(node);
+        }
+    }
+
+    return root->grad;
 }

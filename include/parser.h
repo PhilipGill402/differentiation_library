@@ -9,12 +9,15 @@
 #include "stack.h"
 #include "vector.h"
 #include "node.h"
+#include "entry.h"
+#include "backprop.h"
 
 typedef struct {
     queue_t tokens;
     stack_s op_stack;
     queue_t output;
     vector_t variables;
+    vector_t nodes;
     arena_t* arena;
     lexer_t* lexer;
 } parser_t;

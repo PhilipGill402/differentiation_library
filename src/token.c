@@ -58,11 +58,11 @@ void print_token(void* token) {
             break;
         case FUNC:
             printf("FUNC, ");
-            printstr(&t.val.name, 0);
+            printstr(&t.val.name, 1);
             break;
         case VAR:
             printf("VAR, ");
-            printstr(&t.val.name, 0);
+            printstr(&t.val.name, 1);
             break;
         case LPAREN:
             printf("LPAREN, %c", t.val.op);

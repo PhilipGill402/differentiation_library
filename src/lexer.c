@@ -52,7 +52,7 @@ token_t get_next_token(lexer_t* lexer) {
                 advance(lexer);
             }
 
-            return create_func_token(val);
+            return create_var_token(val);
         } else if (lexer->curr_char == '+') {
             advance(lexer);
             return create_op_token('+');

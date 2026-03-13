@@ -36,6 +36,8 @@ parser_t create_parser(lexer_t* lexer, arena_t* arena) {
     parser.tokens = create_queue(sizeof(token_t), arena);
     parser.op_stack = create_stack(sizeof(token_t), arena);
     parser.output = create_queue(sizeof(token_t), arena);
+    parser.variables = create_vector(sizeof(entry_t), arena);
+    parser.nodes = create_vector(sizeof(node_t*), arena);
     parser.arena = arena;
     parser.lexer = lexer;
 
@@ -48,7 +50,6 @@ void get_infix(parser_t* parser) {
 
     while (token.type != ENDOFFILE) {
         token = get_next_token(parser->lexer);
-
         if (token.type == ENDOFFILE) {
             break;
         }
@@ -63,6 +64,8 @@ void get_postfix(parser_t* parser) {
         token_t token = *(token_t*)dequeue(&parser->tokens);
         
         if (token.type == NUM) {
+            enqueue(&parser->output, &token);
+        } else if (token.type == VAR) {
             enqueue(&parser->output, &token);
         } else if (token.type == OP) {
             while (!stack_is_empty(&parser->op_stack)
@@ -100,12 +103,12 @@ node_t* create_graph(parser_t* parser) {
 
         if (token.type == NUM) {
             node_t* node = create_node(token.val.num, parser->arena);
-            stack_push(&node_stack, &node); 
-        } else if (token.type == VAR) {
-            //TODO: add variable support
-            printf("variables aren't supported yet\n");
-            node_t* node = create_node(token.val.num, parser->arena);
             stack_push(&node_stack, &node);
+            push_back(&parser->nodes, &node);
+        } else if (token.type == VAR) {
+            node_t* node = create_var(&token.val.name, &parser->variables, parser->arena);
+            stack_push(&node_stack, &node);
+            push_back(&parser->nodes, &node);
         } else if (token.type == OP) {
             node_t* right = *(node_t**)stack_pop(&node_stack);
             node_t* left = *(node_t**)stack_pop(&node_stack);
@@ -115,22 +118,27 @@ node_t* create_graph(parser_t* parser) {
                 case '+':
                     node = node_add(left, right, parser->arena);
                     stack_push(&node_stack, &node);
+                    push_back(&parser->nodes, &node);
                     break;
                 case '*':
                     node = node_mul(left, right, parser->arena);
                     stack_push(&node_stack, &node);
+                    push_back(&parser->nodes, &node);
                     break;
                 case '-':
                     node = node_sub(left, right, parser->arena);
                     stack_push(&node_stack, &node);
+                    push_back(&parser->nodes, &node);
                     break;
                 case '/':
                     node = node_div(left, right, parser->arena);
                     stack_push(&node_stack, &node);
+                    push_back(&parser->nodes, &node);
                     break;
                 case '^':
                     node = node_pow(left, right, parser->arena);
                     stack_push(&node_stack, &node);
+                    push_back(&parser->nodes, &node);
                     break;
                 default:
                     fprintf(stderr, "Did not understand operator '%c' in 'create_graph'\n", token.val.op); 
@@ -147,8 +155,14 @@ node_t* parse(const char* expr, arena_t* arena) {
     parser_t parser = create_parser(&lexer, arena);
     get_infix(&parser);
     get_postfix(&parser);
-
     node_t* root = create_graph(&parser);
+    backprop(root, &parser.nodes);
+
+    for (int i = 0; i < parser.variables.size; i++) {
+        entry_t entry = *(entry_t*)get(&parser.variables, i);
+        print_entry(&entry);
+        printf("\n");
+    }
 
     return root;
 }
