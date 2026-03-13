@@ -42,3 +42,7 @@ node_t* node_mul(node_t* node_a, node_t* node_b, arena_t* arena) {
 
     return node;
 }
+
+void print_node(node_t* node) {
+    printf("NODE(Value: %f, Gradient: %f)", node->value, node->grad);
+}

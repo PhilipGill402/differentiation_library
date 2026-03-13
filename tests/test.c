@@ -5,14 +5,12 @@
 int main() {
     arena_t arena = create_arena(PAGE_SIZE);
     
-    char* expr = "3*(3+3)";
-    lexer_t lexer = create_lexer(expr, &arena);
-    parser_t parser = create_parser(&lexer, &arena);
-    get_infix(&parser);
-    get_postfix(&parser);
+    char* expr = "3*(4+5)";
+    node_t* root = parse(expr, &arena); 
 
-    print_queue(&parser.output, print_token);
-    
+    backprop(root);
+
+    print_node(root); 
 
     /*
     token_t token = get_next_token(&lexer);

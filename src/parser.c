@@ -61,8 +61,6 @@ void get_infix(parser_t* parser) {
 void get_postfix(parser_t* parser) {
     while (!is_empty(&parser->tokens)) {
         token_t token = *(token_t*)dequeue(&parser->tokens);
-        print_token(&token);
-        printf("\n");
         
         if (token.type == NUM) {
             enqueue(&parser->output, &token);
@@ -92,15 +90,51 @@ void get_postfix(parser_t* parser) {
 }
 
 node_t* create_graph(parser_t* parser) {
-    stack_t node_stack = create_stack(sizeof(node_t*), parser->arena);
-
+    stack_s node_stack = create_stack(sizeof(node_t*), parser->arena);
+    
     while (!is_empty(&parser->output)) {
         token_t token = *(token_t*)dequeue(&parser->output);
 
         if (token.type == NUM) {
             node_t* node = create_node(token.val.num, parser->arena);
             stack_push(&node_stack, &node); 
+        } else if (token.type == VAR) {
+            //TODO: add variable support
+            printf("variables aren't supported yet\n");
+            node_t* node = create_node(token.val.num, parser->arena);
+            stack_push(&node_stack, &node);
+        } else if (token.type == OP) {
+            node_t* right = *(node_t**)stack_pop(&node_stack);
+            node_t* left = *(node_t**)stack_pop(&node_stack);
+            node_t* node;
+
+            switch (token.val.op) {
+                case '+':
+                    node = node_add(left, right, parser->arena);
+                    stack_push(&node_stack, &node);
+                    break;
+                case '*':
+                    node = node_mul(left, right, parser->arena);
+                    stack_push(&node_stack, &node);
+                    break;
+                default:
+                    fprintf(stderr, "Did not understand operator '%c' in 'create_graph'\n", token.val.op); 
+                    break;
+            } 
         }
     }
+    
+    return *(node_t**)stack_top(&node_stack);
+}
+
+node_t* parse(const char* expr, arena_t* arena) {
+    lexer_t lexer = create_lexer(expr, arena);
+    parser_t parser = create_parser(&lexer, arena);
+    get_infix(&parser);
+    get_postfix(&parser);
+
+    node_t* root = create_graph(&parser);
+
+    return root;
 }
 

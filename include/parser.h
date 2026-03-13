@@ -20,6 +20,7 @@ typedef struct {
 parser_t create_parser(lexer_t* lexer, arena_t* arena);
 void get_infix(parser_t* parser);
 void get_postfix(parser_t* parser);
-
+node_t* create_graph(parser_t* parser);
+node_t* parse(const char* expr, arena_t* arena);
 
 #endif // !INCLUDE_PARSER_H_
