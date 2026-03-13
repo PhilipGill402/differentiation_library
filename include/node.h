@@ -29,6 +29,7 @@ node_t* node_sub(node_t* node_a, node_t* node_b, arena_t* arena);
 node_t* node_mul(node_t* node_a, node_t* node_b, arena_t* arena);
 node_t* node_div(node_t* node_a, node_t* node_b, arena_t* arena);
 node_t* node_pow(node_t* node_a, node_t* node_b, arena_t* arena);
+node_t* node_func(node_t* node_a, double (*func)(node_t*), void (*backward_fn)(node_t* self), arena_t* arena);
 void print_node(node_t* node);
 
 void print_entry(const entry_t* entry);

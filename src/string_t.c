@@ -127,6 +127,16 @@ double string_to_double(string_t* str) {
     return strtod(buffer, NULL);
 }
 
+string_t string_upper(string_t* str) {
+    string_t new_str = create_string(str->allocator);
+
+    for (int i = 0; i < str->len; i++) {
+        string_append_chr(&new_str, toupper(str->str[i])); 
+    }
+
+    return new_str;
+}
+
 void free_string(string_t* str) {
     if (str->allocator) {
         release(str->str, str->allocator);

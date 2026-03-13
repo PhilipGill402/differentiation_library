@@ -31,6 +31,41 @@ int is_right_associative(token_t token) {
     }
 }
 
+double node_sin(node_t* node) {
+    return sin(node->value);
+}
+
+double node_cos(node_t* node) {
+    return cos(node->value);
+}
+
+double node_tan(node_t* node) {
+    return tan(node->value);
+}
+
+double node_sqrt(node_t* node) {
+    return sqrt(node->value);
+}
+
+void backward_sin(node_t* self) {
+    self->left->grad += cos(self->left->value) * self->grad;
+}
+
+void backward_cos(node_t* self) {
+    self->left->grad += -sin(self->left->value) * self->grad;
+}
+
+void backward_tan(node_t* self) {
+    double sec = 1.0 / cos(self->left->value);
+    self->left->grad += sec * sec * self->grad;
+}
+
+void backward_sqrt(node_t* self) {
+    double x = 0.5 / sqrt(self->left->value);
+    self->left->grad += x * self->grad;
+}
+
+/* PARSER */
 parser_t init_parser(lexer_t* lexer, arena_t* arena) {
     parser_t parser;
     parser.tokens = create_queue(sizeof(token_t), arena);
@@ -67,6 +102,8 @@ void get_postfix(parser_t* parser) {
             enqueue(&parser->output, &token);
         } else if (token.type == VAR) {
             enqueue(&parser->output, &token);
+        } else if (token.type == FUNC) {
+            stack_push(&parser->op_stack, &token);
         } else if (token.type == OP) {
             while (!stack_is_empty(&parser->op_stack)
                     && ((*(token_t*)stack_top(&parser->op_stack)).type == OP) 
@@ -86,6 +123,11 @@ void get_postfix(parser_t* parser) {
             }
 
             stack_pop(&parser->op_stack);
+
+            if (!stack_is_empty(&parser->op_stack) && (*(token_t*)stack_top(&parser->op_stack)).type == FUNC) {
+                token_t fn = *(token_t*)stack_pop(&parser->op_stack);
+                enqueue(&parser->output, &fn);
+            }
         }
     }
 
@@ -144,6 +186,35 @@ node_t* create_graph(parser_t* parser) {
                     fprintf(stderr, "Did not understand operator '%c' in 'create_graph'\n", token.val.op); 
                     break;
             } 
+        } else if (token.type == FUNC) {
+            string_t sin_str = string_literal("SIN", parser->arena);
+            string_t cos_str = string_literal("COS", parser->arena);
+            string_t tan_str = string_literal("TAN", parser->arena);
+            string_t sqrt_str = string_literal("SQRT", parser->arena);
+            string_t upper_str = string_upper(&token.val.name);
+            node_t* left = *(node_t**)stack_pop(&node_stack);
+            node_t* node;
+
+            if (string_compare(&upper_str, &sin_str) == 0) {
+                node = node_func(left, node_sin, backward_sin, parser->arena);
+                stack_push(&node_stack, &node);
+                push_back(&parser->nodes, &node);
+            } else if (string_compare(&upper_str, &cos_str) == 0) {
+                node = node_func(left, node_cos, backward_cos, parser->arena);
+                stack_push(&node_stack, &node);
+                push_back(&parser->nodes, &node);
+            } else if (string_compare(&upper_str, &tan_str) == 0) {
+                node = node_func(left, node_tan, backward_tan, parser->arena);
+                stack_push(&node_stack, &node);
+                push_back(&parser->nodes, &node);
+            } else if (string_compare(&upper_str, &sqrt_str) == 0) {
+                node = node_func(left, node_sqrt, backward_sqrt, parser->arena);
+                stack_push(&node_stack, &node);
+                push_back(&parser->nodes, &node);
+            } else {
+                printstr(&token.val.name, 0);
+                fprintf(stderr, "Function is not defined\n");
+            }
         }
     }
     

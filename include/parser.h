@@ -1,6 +1,7 @@
 #ifndef INCLUDE_PARSER_H_
 #define INCLUDE_PARSER_H_
 
+#include <math.h>
 #include "lexer.h"
 #include "token.h"
 #include "string_t.h"

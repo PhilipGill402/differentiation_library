@@ -6,8 +6,21 @@ lexer_t create_lexer(const char* expr, arena_t* arena) {
         .curr_char = expr[0],
         .arena = arena,
         .expr = expr,
-        .len = strlen(expr)
+        .len = strlen(expr),
+        .functions = create_vector(sizeof(string_t), arena)
     };
+   
+    string_t name = string_literal("SIN", arena);
+    push_back(&lexer.functions, &name);
+    
+    name = string_literal("COS", arena);
+    push_back(&lexer.functions, &name);
+    
+    name = string_literal("TAN", arena);
+    push_back(&lexer.functions, &name);
+
+    name = string_literal("SQRT", arena);
+    push_back(&lexer.functions, &name);
 
     return lexer;
 }
@@ -19,6 +32,19 @@ void advance(lexer_t* lexer) {
     }
 
     lexer->curr_char = lexer->expr[lexer->pos++];
+}
+
+int is_function(lexer_t* lexer, string_t* func) {
+    string_t upper_given = string_upper(func); 
+
+    for (int i = 0; i < lexer->functions.size; i++) {
+        string_t function = *(string_t*)get(&lexer->functions, i); 
+        if (string_compare(&upper_given, &function) == 0) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 token_t get_next_token(lexer_t* lexer) {
@@ -50,6 +76,10 @@ token_t get_next_token(lexer_t* lexer) {
             while (isalpha(lexer->curr_char)) {
                 string_append_chr(&val, lexer->curr_char);
                 advance(lexer);
+            }
+
+            if (is_function(lexer, &val)) {
+                return create_func_token(val);
             }
 
             return create_var_token(val);

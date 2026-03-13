@@ -5,6 +5,7 @@
 #include "string_t.h"
 #include "arena.h"
 #include "token.h"
+#include "vector.h"
 
 typedef struct {
     int pos;
@@ -12,6 +13,7 @@ typedef struct {
     arena_t* arena;
     const char* expr;
     int len;
+    vector_t functions;
 } lexer_t;
 
 lexer_t create_lexer(const char* expr, arena_t* arena);

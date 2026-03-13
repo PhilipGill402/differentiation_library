@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef struct arena_t arena_t;
 void* reserve(size_t size, arena_t* arena);
@@ -24,6 +25,7 @@ void string_append_chr(string_t* string, char ch);
 void string_cat(string_t* dst, string_t* src);
 int string_compare(string_t* a, string_t* b);
 double string_to_double(string_t* str);
+string_t string_upper(string_t* str);
 void free_string(string_t* str);
 void printstr(const string_t* str, int end);
 

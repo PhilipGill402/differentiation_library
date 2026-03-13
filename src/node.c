@@ -131,6 +131,18 @@ node_t* node_pow(node_t* node_a, node_t* node_b, arena_t* arena) {
     return node;
 }
 
+node_t* node_func(node_t* node_a, double (*func)(node_t*), void (*backward_fn)(node_t* self), arena_t* arena) {
+    node_t* node = reserve(sizeof(node_t), arena);
+    node->value = func(node_a);
+    node->grad = 0;
+    node->left = node_a;
+    node->right = NULL;
+    node->backward = backward_fn;
+    node->is_var = 0;
+
+    return node;
+}
+
 void print_node(node_t* node) {
     printf("NODE(Value: %f, Gradient: %f)", node->value, node->grad);
 }
