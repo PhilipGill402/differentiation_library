@@ -65,6 +65,12 @@ token_t get_next_token(lexer_t* lexer) {
         } else if (lexer->curr_char == '/') {
             advance(lexer);
             return create_op_token('/');
+        } else if (lexer->curr_char == '(') {
+            advance(lexer);
+            return create_token(LPAREN, '(');
+        } else if (lexer->curr_char == ')') {
+            advance(lexer);
+            return create_token(RPAREN, ')');
         } else {
             token_t token = {
                 .type = UNKNOWN,

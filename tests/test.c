@@ -1,13 +1,20 @@
 #include "backprop.h"
-#include "lexer.h"
+#include "parser.h"
 #include <stdio.h>
 
 int main() {
     arena_t arena = create_arena(PAGE_SIZE);
     
-    char* expr = "3*3+3";
+    char* expr = "3*(3+3)";
     lexer_t lexer = create_lexer(expr, &arena);
+    parser_t parser = create_parser(&lexer, &arena);
+    get_infix(&parser);
+    get_postfix(&parser);
+
+    print_queue(&parser.output, print_token);
     
+
+    /*
     token_t token = get_next_token(&lexer);
     print_token(&token);
 
@@ -16,7 +23,6 @@ int main() {
         print_token(&token);
     }
 
-    /*
     node_t* x = create_node(3.0, &arena);
     node_t* mul = node_mul(x, x, &arena);
     node_t* add = node_add(mul, x, &arena);
