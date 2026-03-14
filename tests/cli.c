@@ -20,25 +20,22 @@ int main() {
         fgets(input_buff, MAX_INPUT_SIZE, stdin);
         
         char* cmd = strtok(input_buff, " ");
-        while (strcmp(cmd, "set") == 0) {
+
+        if (strcmp(cmd, "exit\n") == 0) {
+            break;
+        } else if (strcmp(cmd, "set") == 0) {
             char* var = strtok(NULL, " ");
             char* val_str = strtok(NULL, " ");
             double val = atof(val_str);
             
             set_var(&parser, var, val);
-            printf(">> ");
-            fgets(input_buff, MAX_INPUT_SIZE, stdin);
-            cmd = strtok(input_buff, " ");
+        } else {
+            set_expr(input_buff, &parser);
+            node_t* root = parse(&parser);
+            print_derivatives(&parser);
+            printf("%f\n", root->value);
         }
-        
-        if (strcmp(input_buff, "exit\n") == 0) {
-            break;
-        }
-        
-        set_expr(input_buff, &parser);
-        node_t* root = parse(&parser);
-        print_derivatives(&parser);
-        printf("%f\n", root->value); 
+
     } while (strcmp(input_buff, "exit") != 0);
 
     release_parser(&parser);
