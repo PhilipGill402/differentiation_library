@@ -66,7 +66,7 @@ void backward_sqrt(node_t* self) {
 }
 
 /* PARSER */
-parser_t init_parser(lexer_t* lexer, arena_t* arena) {
+parser_t init_parser(arena_t* arena) {
     parser_t parser;
     parser.tokens = create_queue(sizeof(token_t), arena);
     parser.op_stack = create_stack(sizeof(token_t), arena);
@@ -74,7 +74,7 @@ parser_t init_parser(lexer_t* lexer, arena_t* arena) {
     parser.variables = create_vector(sizeof(entry_t), arena);
     parser.nodes = create_vector(sizeof(node_t*), arena);
     parser.arena = arena;
-    parser.lexer = lexer;
+    parser.lexer = NULL;
 
     return parser;
 }
@@ -222,16 +222,20 @@ node_t* create_graph(parser_t* parser) {
 }
 
 
-parser_t create_parser(const char* expr) {
+parser_t create_parser() {
     arena_t* arena = malloc(sizeof(arena_t));
     *arena = create_arena(PAGE_SIZE);
 
-    lexer_t* lexer = reserve(sizeof(lexer_t), arena); 
-    *lexer = create_lexer(expr, arena);
-
-    parser_t parser = init_parser(lexer, arena);
+    parser_t parser = init_parser(arena);
 
     return parser;
+}
+
+void set_expr(const char* expr, parser_t* parser) {
+    lexer_t* lexer = reserve(sizeof(lexer_t), parser->arena); 
+    *lexer = create_lexer(expr, parser->arena);
+
+    parser->lexer = lexer;
 }
 
 node_t* parse(parser_t* parser) {
@@ -240,12 +244,6 @@ node_t* parse(parser_t* parser) {
 
     node_t* root = create_graph(parser);
     backprop(root, &parser->nodes);
-
-    for (int i = 0; i < parser->variables.size; i++) {
-        entry_t entry = *(entry_t*)get(&parser->variables, i);
-        print_entry(&entry);
-        printf("\n");
-    }
 
     return root;
 }

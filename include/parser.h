@@ -24,11 +24,12 @@ typedef struct {
     lexer_t* lexer;
 } parser_t;
 
-parser_t init_parser(lexer_t* lexer, arena_t* arena);
+parser_t init_parser(arena_t* arena);
+void set_expr(const char* expr, parser_t* parser);
 void get_infix(parser_t* parser);
 void get_postfix(parser_t* parser);
 node_t* create_graph(parser_t* parser);
-parser_t create_parser(const char* expr);
+parser_t create_parser();
 node_t* parse(parser_t* parser);
 void create_var(parser_t* parser, char* name);
 void set_var(parser_t* parser, char* name, double val);
