@@ -282,11 +282,9 @@ You will likely need to link against the math library.
 ### Build the CLI
 
 ```bash
-gcc arena.c backprop.c lexer.c node.c parser.c queue.c stack.c string_t.c token.c vector.c cli.c -lm -o cli
-./cli
+make
+./test
 ```
-
-If you are using a Makefile, point the build target at `cli.c` instead of another test file.
 
 ## Current Limitations
 
