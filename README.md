@@ -43,6 +43,7 @@ This project includes:
 - compute gradients with reverse-mode autodiff
 - create variables and assign values before parsing/evaluation
 - use a custom arena allocator for most project memory
+- contains a cli which allows for quick expression evaluation
 
 ## Project Structure
 
@@ -125,7 +126,8 @@ This allows the project to compute gradients for all variables used in the expre
 
 ```c
 int main() {
-    parser_t parser = create_parser("3*(3+3)");
+    parser_t parser = create_parser();
+    set_expr("3*(3+3)", &parser);
     node_t* root = parse(&parser);
 
     print_node(root);
@@ -139,7 +141,8 @@ int main() {
 
 ```c
 int main() {
-    parser_t parser = create_parser("x*x+x");
+    parser_t parser = create_parser();
+    set_expr("x*x+x", &parser);
     set_var(&parser, "x", 3.0);
 
     node_t* root = parse(&parser);
@@ -155,7 +158,8 @@ int main() {
 
 ```c
 int main() {
-    parser_t parser = create_parser("sin(x)+sqrt(x)");
+    parser_t parser = create_parser();
+    set_expr("sin(x)+sqrt(x)", &parser);
     set_var(&parser, "x", 4.0);
 
     node_t* root = parse(&parser);
